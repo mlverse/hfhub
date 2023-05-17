@@ -187,3 +187,5 @@ WEIGHTS_NAME <- function() "pytorch_model.bin"
 #' @export
 #' @describeIn WEIGHTS_NAME Name of weights index file
 WEIGHTS_INDEX_NAME <- function() "pytorch_model.bin.index.json"
+
+utils::globalVariables("tmp")
