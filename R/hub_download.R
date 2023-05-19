@@ -149,18 +149,30 @@ get_file_metadata <- function(url) {
     url = url,
     httr::add_headers("Accept-Encoding" = "identity")
   )
+  if (req$status_code != 200) {
+    cli::cli_abort(c(
+      x = "Failed acquiring file metadata. Status code {.val {req$status_code}}."
+    ))
+  }
   list(
-    commit_hash = grab_from_headers(req$all_headers, "x-repo-commit"),
-    etag = normalize_etag(grab_from_headers(req$all_headers, "etag")),
-    size = as.integer(grab_from_headers(req$all_headers, "content-length"))
+    commit_hash = grab_from_headers(req, "x-repo-commit"),
+    etag = normalize_etag(grab_from_headers(req, c(HUGGINGFACE_HEADER_X_LINKED_ETAG(), "etag"))),
+    size = as.integer(grab_from_headers(req, "content-length"))
   )
 }
 
-grab_from_headers <- function(headers, nm) {
-  for(h in headers) {
-    header <- h$headers
-    if (!is.null(header[[nm]]))
-      return(header[[nm]])
+grab_from_headers <- function(req, nms) {
+  headers <- req$all_headers
+  for (nm in nms) {
+    nm <- tolower(nm)
+
+    for(h in headers) {
+      header <- h$headers
+      names(headers) <- tolower(headers)
+
+      if (!is.null(header[[nm]]))
+        return(header[[nm]])
+    }
   }
   NULL
 }
@@ -191,5 +203,6 @@ WEIGHTS_NAME <- function() "pytorch_model.bin"
 #' @export
 #' @describeIn WEIGHTS_NAME Name of weights index file
 WEIGHTS_INDEX_NAME <- function() "pytorch_model.bin.index.json"
+HUGGINGFACE_HEADER_X_LINKED_ETAG <- function() "X-Linked-Etag"
 
 utils::globalVariables("tmp")
