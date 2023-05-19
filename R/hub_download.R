@@ -43,6 +43,14 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
 
       # Expected (uncompressed) size
       expected_size <- metadata$size
+
+      # In case of a redirect, save an extra redirect on the request.get call,
+      # and ensure we download the exact atomic version even if it changed
+      # between the HEAD and the GET (unlikely, but hey).
+      # Useful for lfs blobs that are stored on a CDN.
+      if (metadata$location != url) {
+        url <- metadata$location
+      }
     })
   }
 
@@ -144,18 +152,16 @@ repo_folder_name <- function(repo_id, repo_type = "model") {
   glue::glue("{repo_type}s{REPO_ID_SEPARATOR()}{repo_id}")
 }
 
+#' @importFrom rlang %||%
 get_file_metadata <- function(url) {
-  req <- httr::HEAD(
+  req <- reqst(httr::HEAD,
     url = url,
-    httr::add_headers("Accept-Encoding" = "identity", "user-agent" = "hfhub/0.0.1")
+    httr::config(followlocation = FALSE),
+    httr::add_headers("Accept-Encoding" = "identity", "user-agent" = "hfhub/0.0.1"),
+    follow_relative_redirects = TRUE
   )
-  if (req$status_code != 200) {
-    cli::cli_abort(c(
-      x = "Failed acquiring file metadata. Status code {.val {req$status_code}}.",
-      i = "Tried a HEAD request into {.url {req$url}}"
-    ))
-  }
   list(
+    location = grab_from_headers(req, "location") %||% req$url,
     commit_hash = grab_from_headers(req, "x-repo-commit"),
     etag = normalize_etag(grab_from_headers(req, c(HUGGINGFACE_HEADER_X_LINKED_ETAG(), "etag"))),
     size = as.integer(grab_from_headers(req, "content-length"))
@@ -206,4 +212,19 @@ WEIGHTS_NAME <- function() "pytorch_model.bin"
 WEIGHTS_INDEX_NAME <- function() "pytorch_model.bin.index.json"
 HUGGINGFACE_HEADER_X_LINKED_ETAG <- function() "X-Linked-Etag"
 
-utils::globalVariables("tmp")
+reqst <- function(method, url, ..., follow_relative_redirects = FALSE) {
+  if (follow_relative_redirects) {
+    r <- reqst(method, url, ..., follow_relative_redirects = FALSE)
+    if (r$status_code >= 300 && r$status_code <= 399) {
+      redirect_url <- urltools::url_parse(httr::headers(r)$location)
+      if (is.na(redirect_url$domain)) {
+        p <- urltools::url_parse(url)
+        p$path <- redirect_url$path
+        url <- urltools::url_compose(p)
+        return(reqst(method, url, ..., follow_relative_redirects = TRUE))
+      }
+    }
+  }
+  method(url, ...)
+}
+

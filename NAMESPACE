@@ -3,3 +3,4 @@
 export(WEIGHTS_INDEX_NAME)
 export(WEIGHTS_NAME)
 export(hub_download)
+importFrom(rlang,"%||%")

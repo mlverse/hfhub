@@ -12,10 +12,11 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports:
-  httr,
-  filelock,
-  fs,
-  cli,
-  withr,
-  curl,
-  glue
+    httr,
+    filelock,
+    fs,
+    cli,
+    withr,
+    curl,
+    glue,
+    urltools
