@@ -151,7 +151,8 @@ get_file_metadata <- function(url) {
   )
   if (req$status_code != 200) {
     cli::cli_abort(c(
-      x = "Failed acquiring file metadata. Status code {.val {req$status_code}}."
+      x = "Failed acquiring file metadata. Status code {.val {req$status_code}}.",
+      i = "Tried a HEAD request into {.url {req$url}}"
     ))
   }
   list(
