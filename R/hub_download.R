@@ -147,7 +147,7 @@ repo_folder_name <- function(repo_id, repo_type = "model") {
 get_file_metadata <- function(url) {
   req <- httr::HEAD(
     url = url,
-    httr::add_headers("Accept-Encoding" = "identity")
+    httr::add_headers("Accept-Encoding" = "identity", "user-agent" = "hfhub/0.0.1")
   )
   if (req$status_code != 200) {
     cli::cli_abort(c(
