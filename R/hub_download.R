@@ -117,7 +117,11 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
   withr::with_tempfile("tmp", {
     lock <- filelock::lock(paste0(blob_path, ".lock"))
     on.exit({filelock::unlock(lock)})
-    curl::curl_download(url, tmp, quiet = !interactive())
+    tryCatch({
+      curl::curl_download(url, tmp, quiet = FALSE)
+    }, error = function(err) {
+      cli::cli_abort("Error downloading from {.url {url}}", parent = err)
+    })
     fs::file_move(tmp, blob_path)
     fs::link_create(blob_path, pointer_path)
   })
