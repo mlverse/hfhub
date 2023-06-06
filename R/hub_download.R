@@ -126,7 +126,20 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
     lock <- filelock::lock(paste0(blob_path, ".lock"))
     on.exit({filelock::unlock(lock)})
     tryCatch({
-      curl::curl_download(url, tmp, quiet = FALSE)
+      bar_id <- cli::cli_progress_bar(
+        name = filename,
+        total = if (is.numeric(expected_size)) expected_size else NA,
+        type = "download",
+      )
+      progress <- function(down, up) {
+        if (down[1] !=0) {
+          cli::cli_progress_update(total = down[1], set = down[2], id = bar_id)
+        }
+        TRUE
+      }
+      handle <- curl::new_handle(noprogress = FALSE, progressfunction = progress)
+      curl::curl_download(url, tmp, handle = handle, quiet = FALSE)
+      cli::cli_progress_done(id = bar_id)
     }, error = function(err) {
       cli::cli_abort("Error downloading from {.url {url}}", parent = err)
     })
