@@ -241,3 +241,5 @@ reqst <- function(method, url, ..., follow_relative_redirects = FALSE) {
   method(url, ...)
 }
 
+utils::globalVariables("tmp")
+

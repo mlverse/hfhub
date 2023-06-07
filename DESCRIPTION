@@ -19,7 +19,9 @@ Imports:
     withr,
     curl,
     glue,
-    urltools
+    urltools,
+    rlang
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    jsonlite
 Config/testthat/edition: 3
