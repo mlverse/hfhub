@@ -209,7 +209,7 @@ REPO_ID_SEPARATOR <- function() {
 }
 HUGGINGFACE_HUB_CACHE <- function() {
   path <- Sys.getenv("HUGGINGFACE_HUB_CACHE", "~/.cache/huggingface/hub")
-  path.expand(path)
+  fs::path_expand(path)
 }
 REGEX_COMMIT_HASH <- function() {
   "^[0-9a-f]{40}$"
