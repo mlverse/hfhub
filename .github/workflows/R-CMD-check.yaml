@@ -27,7 +27,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
-      HUGGINGFACE_HUB_CACHE: ${{ env.RUNNER_TEMP }}/cache/
+      HUGGINGFACE_HUB_CACHE: ${{ runner.temp }}/cache/
 
     steps:
       - uses: actions/checkout@v3
