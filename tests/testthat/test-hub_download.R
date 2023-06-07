@@ -1,19 +1,19 @@
 skip_on_cran()
 
 test_that("hub_download", {
-  file <- hub_download("gpt2", filename = "config.json")
+  file <- file(hub_download("gpt2", filename = "config.json"))
   expect_equal(
     jsonlite::fromJSON(file)$architectures,
     "GPT2LMHeadModel"
   )
 
-  file <- hub_download("gpt2", filename = "config.json", force_download = TRUE)
+  file <- file(hub_download("gpt2", filename = "config.json", force_download = TRUE))
   expect_equal(
     jsonlite::fromJSON(file)$architectures,
     "GPT2LMHeadModel"
   )
 
-  file <- hub_download("gpt2", filename = "config.json", local_files_only = TRUE)
+  file <- file(hub_download("gpt2", filename = "config.json", local_files_only = TRUE))
   expect_equal(
     jsonlite::fromJSON(file)$architectures,
     "GPT2LMHeadModel"

@@ -138,15 +138,7 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
         TRUE
       }
       handle <- curl::new_handle(noprogress = FALSE, progressfunction = progress)
-
-      ext <- fs::path_ext(filename)
-      mode <- if (length(ext) > 0 && ext %in% "json") {
-        "w"
-      } else {
-        "wb"
-      }
-
-      curl::curl_download(url, tmp, handle = handle, quiet = FALSE, mode = mode)
+      curl::curl_download(url, tmp, handle = handle, quiet = FALSE)
       cli::cli_progress_done(id = bar_id)
     }, error = function(err) {
       cli::cli_abort("Error downloading from {.url {url}}", parent = err)
