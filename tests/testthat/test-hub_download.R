@@ -4,17 +4,17 @@ test_that("hub_download", {
   file <- hub_download("gpt2", filename = "config.json")
 
   expect_equal(
-    jsonlite::fromJSON(fs::link_path(file))$architectures,
+    jsonlite::fromJSON(file)$architectures,
     "GPT2LMHeadModel"
   )
 
-  file <- file(hub_download("gpt2", filename = "config.json", force_download = TRUE))
+  file <- hub_download("gpt2", filename = "config.json", force_download = TRUE)
   expect_equal(
     jsonlite::fromJSON(file)$architectures,
     "GPT2LMHeadModel"
   )
 
-  file <- file(hub_download("gpt2", filename = "config.json", local_files_only = TRUE))
+  file <- hub_download("gpt2", filename = "config.json", local_files_only = TRUE)
   expect_equal(
     jsonlite::fromJSON(file)$architectures,
     "GPT2LMHeadModel"
