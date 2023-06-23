@@ -5,8 +5,15 @@
 #' @param revision Revision (branch, tag or commitid) to download the file from.
 #' @param repo_type The type of the repository. Currently only `"model"` is supported.
 #' @param local_files_only Only use cached files?
-#' @param force_download For redownloading of files that are cached.
+#' @param force_download For re-downloading of files that are cached.
 #' @param ... currenytly unused.
+#'
+#' @returns The file path of the downloaded or cached file.
+#' @examples
+#' try({
+#' path <- hub_download("gpt2", "config.json")
+#' str(jsonlite::fromJSON(path))
+#' })
 #'
 #' @export
 hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = "model", local_files_only = FALSE, force_download = FALSE) {

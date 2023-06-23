@@ -27,8 +27,18 @@ hub_download(
 
 \item{local_files_only}{Only use cached files?}
 
-\item{force_download}{For redownloading of files that are cached.}
+\item{force_download}{For re-downloading of files that are cached.}
+}
+\value{
+The file path of the downloaded or cached file.
 }
 \description{
 Downloads files from HuggingFace repositories
+}
+\examples{
+try({
+path <- hub_download("gpt2", "config.json")
+str(jsonlite::fromJSON(path))
+})
+
 }

@@ -1,12 +1,12 @@
 Package: hfhub
-Title: HuggingFace Hub Interface
+Title: Hugging Face Hub Interface
 Version: 0.0.0.9000
 Authors@R: c(
     person("Daniel", "Falbel", , "daniel@posit.co", role = c("aut", "cre")),
     person(family = "Posit", role = c("cph"))
     )
-Description: Provides functionality to download and cache files from 'HuggingFace Hub'. 
-    Uses the same caching structure so files can be shared between R and Python implementations.
+Description: Provides functionality to download and cache files from 'Hugging Face Hub'. 
+    Uses the same caching structure so files can be shared between different client libraries.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -25,3 +25,4 @@ Suggests:
     testthat (>= 3.0.0),
     jsonlite
 Config/testthat/edition: 3
+URL: https://mlverse.github.io/hfhub/
