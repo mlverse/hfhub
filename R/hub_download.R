@@ -144,6 +144,11 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
       cli::cli_abort("Error downloading from {.url {url}}", parent = err)
     })
     fs::file_move(tmp, blob_path)
+
+    if (!fs::file_access(blob_path, mode = "read")) {
+      fs::file_chmod(blob_path, mode = "u+r")
+    }
+
     fs::link_create(blob_path, pointer_path)
   })
 
