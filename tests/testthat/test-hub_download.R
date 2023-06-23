@@ -1,9 +1,10 @@
 skip_on_cran()
 
 test_that("hub_download", {
-  file <- file(hub_download("gpt2", filename = "config.json"))
+  file <- hub_download("gpt2", filename = "config.json")
+
   expect_equal(
-    jsonlite::fromJSON(file)$architectures,
+    jsonlite::fromJSON(fs::link_path(file))$architectures,
     "GPT2LMHeadModel"
   )
 
