@@ -145,11 +145,8 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
     })
     fs::file_move(tmp, blob_path)
 
-    if (!fs::file_access(blob_path, mode = "read")) {
-      fs::file_chmod(blob_path, mode = "u+r")
-    }
-
-    fs::link_create(blob_path, pointer_path)
+    # fs::link_create doesn't work for linking files on windows.
+    file.symlink(blob_path, pointer_path)
   })
 
   pointer_path
