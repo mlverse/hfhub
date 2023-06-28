@@ -11,8 +11,11 @@
 #' @returns The file path of the downloaded or cached file.
 #' @examples
 #' try({
+#' withr::with_envvar(c(HUGGINGFACE_HUB_CACHE = tempdir()), {
 #' path <- hub_download("gpt2", "config.json")
+#' print(path)
 #' str(jsonlite::fromJSON(path))
+#' })
 #' })
 #'
 #' @export
@@ -160,7 +163,11 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
 }
 
 hub_url <- function(repo_id, filename, ..., revision = "main", repo_type = "model") {
-  glue::glue("https://huggingface.co/{repo_id}/resolve/{revision}/{filename}")
+  if (repo_type == "model") {
+    glue::glue("https://huggingface.co/{repo_id}/resolve/{revision}/{filename}")
+  } else {
+    glue::glue("https://huggingface.co/{repo_type}s/{repo_id}/resolve/{revision}/{filename}")
+  }
 }
 
 get_pointer_path <- function(storage_folder, revision, relative_filename) {
@@ -217,6 +224,9 @@ REPO_ID_SEPARATOR <- function() {
   "--"
 }
 HUGGINGFACE_HUB_CACHE <- function() {
+  # we use the same cache structure as the Python library - which is useful for
+  # numerous reasons. Thus we don't use R's tools for cache handling such as
+  # rappdirs or R_user_dir.
   path <- Sys.getenv("HUGGINGFACE_HUB_CACHE", "~/.cache/huggingface/hub")
   fs::path_expand(path)
 }
@@ -227,11 +237,17 @@ REGEX_COMMIT_HASH <- function() {
 #' Weight file names in HUB
 #'
 #' @describeIn WEIGHTS_NAME Name of weights file
+#'
+#' @returns A string with the default file names for indexes in the Hugging Face Hub.
+#' @examples
+#' WEIGHTS_NAME()
+#' WEIGHTS_INDEX_NAME()
 #' @export
 WEIGHTS_NAME <- function() "pytorch_model.bin"
 #' @export
 #' @describeIn WEIGHTS_NAME Name of weights index file
 WEIGHTS_INDEX_NAME <- function() "pytorch_model.bin.index.json"
+
 HUGGINGFACE_HEADER_X_LINKED_ETAG <- function() "X-Linked-Etag"
 
 reqst <- function(method, url, ..., follow_relative_redirects = FALSE) {

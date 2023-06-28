@@ -9,6 +9,9 @@ WEIGHTS_NAME()
 
 WEIGHTS_INDEX_NAME()
 }
+\value{
+A string with the default file names for indexes in the Hugging Face Hub.
+}
 \description{
 Weight file names in HUB
 }
@@ -19,3 +22,7 @@ Weight file names in HUB
 \item \code{WEIGHTS_INDEX_NAME()}: Name of weights index file
 
 }}
+\examples{
+WEIGHTS_NAME()
+WEIGHTS_INDEX_NAME()
+}

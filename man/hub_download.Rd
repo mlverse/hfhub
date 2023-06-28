@@ -37,8 +37,11 @@ Downloads files from HuggingFace repositories
 }
 \examples{
 try({
+withr::with_envvar(c(HUGGINGFACE_HUB_CACHE = tempdir()), {
 path <- hub_download("gpt2", "config.json")
+print(path)
 str(jsonlite::fromJSON(path))
+})
 })
 
 }

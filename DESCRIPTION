@@ -5,7 +5,7 @@ Authors@R: c(
     person("Daniel", "Falbel", , "daniel@posit.co", role = c("aut", "cre")),
     person(family = "Posit", role = c("cph"))
     )
-Description: Provides functionality to download and cache files from 'Hugging Face Hub'. 
+Description: Provides functionality to download and cache files from 'Hugging Face Hub' <https://huggingface.co/models>. 
     Uses the same caching structure so files can be shared between different client libraries.
 License: MIT + file LICENSE
 Encoding: UTF-8
