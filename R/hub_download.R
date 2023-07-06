@@ -8,7 +8,8 @@
 #' @param force_download For re-downloading of files that are cached.
 #' @param ... currenytly unused.
 #'
-#' @returns The file path of the downloaded or cached file.
+#' @returns The file path of the downloaded or cached file. The snapshot path is returned
+#'   as an attribute.
 #' @examples
 #' try({
 #' withr::with_envvar(c(HUGGINGFACE_HUB_CACHE = tempdir()), {
@@ -142,7 +143,7 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
         type = "download",
       )
       progress <- function(down, up) {
-        if (down[1] !=0) {
+        if (down[1] != 0) {
           cli::cli_progress_update(total = down[1], set = down[2], id = bar_id)
         }
         TRUE
@@ -156,6 +157,7 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
     fs::file_move(tmp, blob_path)
 
     # fs::link_create doesn't work for linking files on windows.
+    try(fs::file_delete(pointer_path), silent = TRUE) # delete the link to avoid warnings
     file.symlink(blob_path, pointer_path)
   })
 
@@ -171,8 +173,9 @@ hub_url <- function(repo_id, filename, ..., revision = "main", repo_type = "mode
 }
 
 get_pointer_path <- function(storage_folder, revision, relative_filename) {
-  snapshot_path <- fs::path(storage_folder, "snapshots")
-  pointer_path <- fs::path(snapshot_path, revision, relative_filename)
+  snapshot_path <- fs::path(storage_folder, "snapshots", revision)
+  pointer_path <- fs::path(snapshot_path, relative_filename)
+  attr(pointer_path, "snapshot_path") <- snapshot_path
   pointer_path
 }
 
