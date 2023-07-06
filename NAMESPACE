@@ -2,5 +2,8 @@
 
 export(WEIGHTS_INDEX_NAME)
 export(WEIGHTS_NAME)
+export(hub_dataset_info)
 export(hub_download)
+export(hub_repo_info)
+export(hub_snapshot)
 importFrom(rlang,"%||%")
