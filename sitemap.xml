@@ -16,10 +16,19 @@
     <loc>https://mlverse.github.io/hfhub/index.html</loc>
   </url>
   <url>
+    <loc>https://mlverse.github.io/hfhub/news/index.html</loc>
+  </url>
+  <url>
     <loc>https://mlverse.github.io/hfhub/reference/WEIGHTS_NAME.html</loc>
   </url>
   <url>
     <loc>https://mlverse.github.io/hfhub/reference/hub_download.html</loc>
+  </url>
+  <url>
+    <loc>https://mlverse.github.io/hfhub/reference/hub_repo_info.html</loc>
+  </url>
+  <url>
+    <loc>https://mlverse.github.io/hfhub/reference/hub_snapshot.html</loc>
   </url>
   <url>
     <loc>https://mlverse.github.io/hfhub/reference/index.html</loc>
