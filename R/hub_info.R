@@ -37,8 +37,7 @@ hub_dataset_info <- function(repo_id, ..., revision = NULL, files_metadata = FAL
     repo_id,
     revision = revision,
     repo_type = "dataset",
-    files_metadata = files_metadata,
-    token = token
+    files_metadata = files_metadata
   )
 }
 
