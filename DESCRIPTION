@@ -1,6 +1,6 @@
 Package: hfhub
 Title: Hugging Face Hub Interface
-Version: 0.1.1
+Version: 0.1.1.9000
 Authors@R: c(
     person("Daniel", "Falbel", , "daniel@posit.co", role = c("aut", "cre")),
     person(family = "Posit", role = c("cph"))
