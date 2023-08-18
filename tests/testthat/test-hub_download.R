@@ -27,3 +27,25 @@ test_that("hub_download", {
   })
   expect_equal(list.files(tmp), "models--gpt2")
 })
+
+test_that("can download from private repo", {
+
+  skip_if_no_token()
+
+  expect_error(regexp = NA, {
+    hub_download(
+      repo_id = "dfalbel/test-hfhub",
+      filename = ".gitattributes",
+      force_download = TRUE
+    )
+  })
+
+  expect_error(regexp = NA, {
+    hub_download(
+      repo_id = "dfalbel/test-hfhub",
+      filename = "hello.safetensors",
+      force_download = TRUE
+    )
+  })
+
+})

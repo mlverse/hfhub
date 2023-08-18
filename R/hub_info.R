@@ -19,12 +19,12 @@ hub_repo_info <- function(repo_id, ..., repo_type = NULL, revision = NULL, files
     params$blobs <- TRUE
   }
 
+  headers <- hub_headers()
+
   results <- httr::GET(
     path,
     query = params,
-    httr::add_headers(
-      "user-agent" = "hfhub/0.0.1"
-    )
+    httr::add_headers(.headers = headers)
   )
 
   httr::content(results)

@@ -149,6 +149,7 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
         TRUE
       }
       handle <- curl::new_handle(noprogress = FALSE, progressfunction = progress)
+      curl::handle_setheaders(handle, .list = hub_headers())
       curl::curl_download(url, tmp, handle = handle, quiet = FALSE)
       cli::cli_progress_done(id = bar_id)
     }, error = function(err) {
@@ -184,12 +185,30 @@ repo_folder_name <- function(repo_id, repo_type = "model") {
   glue::glue("{repo_type}s{REPO_ID_SEPARATOR()}{repo_id}")
 }
 
+hub_headers <- function() {
+  headers <- c("user-agent" = "hfhub/0.0.1")
+
+  token <- Sys.getenv("HUGGING_FACE_HUB_TOKEN", unset = "")
+  if (!nzchar(token))
+    token <- Sys.getenv("HUGGINGFACE_HUB_TOKEN", unset = "")
+
+  if (nzchar(token)) {
+    headers["authorization"] <- paste0("Bearer ", token)
+  }
+
+  headers
+}
+
 #' @importFrom rlang %||%
 get_file_metadata <- function(url) {
+
+  headers <- hub_headers()
+  headers["Accept-Encoding"] <- "identity"
+
   req <- reqst(httr::HEAD,
     url = url,
     httr::config(followlocation = FALSE),
-    httr::add_headers("Accept-Encoding" = "identity", "user-agent" = "hfhub/0.0.1"),
+    httr::add_headers(.headers = headers),
     follow_relative_redirects = TRUE
   )
   list(
