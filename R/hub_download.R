@@ -44,12 +44,12 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
 
       commit_hash <- metadata$commit_hash
       if (is.null(commit_hash)) {
-        cli::cli_abort("Distant resource does not seem to be on huggingface.co (missing commit header).")
+        cli::cli_abort(gettext("Distant resource does not seem to be on huggingface.co (missing commit header)."))
       }
 
       etag <- metadata$etag
       if (is.null(etag)) {
-        cli::cli_abort("Distant resource does not have an ETag, we won't be able to reliably ensure reproducibility.")
+        cli::cli_abort(gettext("Distant resource does not have an ETag, we won't be able to reliably ensure reproducibility."))
       }
 
       # Expected (uncompressed) size
@@ -90,13 +90,13 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
     }
 
     if (local_files_only) {
-      cli::cli_abort(paste0(
+      cli::cli_abort(gettext(
         "Cannot find the requested files in the disk cache and",
         " outgoing traffic has been disabled. To enable hf.co look-ups",
         " and downloads online, set 'local_files_only' to False."
       ))
     } else {
-      cli::cli_abort(paste0(
+      cli::cli_abort(gettext(
         "Connection error, and we cannot find the requested files in",
         " the disk cache. Please try again or make sure your Internet",
         " connection is on."
@@ -104,8 +104,8 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
     }
   }
 
-  if (is.null(etag)) cli::cli_abort("etag must have been retrieved from server")
-  if (is.null(commit_hash)) cli::cli_abort("commit_hash must have been retrieved from server")
+  if (is.null(etag)) cli::cli_abort(gettext("etag must have been retrieved from server"))
+  if (is.null(commit_hash)) cli::cli_abort(gettext("commit_hash must have been retrieved from server"))
 
   blob_path <- fs::path(storage_folder, "blobs", etag)
   pointer_path <- get_pointer_path(storage_folder, commit_hash, filename)
@@ -153,7 +153,7 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
       curl::curl_download(url, tmp, handle = handle, quiet = FALSE)
       cli::cli_progress_done(id = bar_id)
     }, error = function(err) {
-      cli::cli_abort("Error downloading from {.url {url}}", parent = err)
+      cli::cli_abort(gettext("Error downloading from {.url {url}}"), parent = err)
     })
     fs::file_move(tmp, blob_path)
 
