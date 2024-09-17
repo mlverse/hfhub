@@ -3,6 +3,7 @@ Title: Hugging Face Hub Interface
 Version: 0.1.1.9000
 Authors@R: c(
     person("Daniel", "Falbel", , "daniel@posit.co", role = c("aut", "cre")),
+    person("Regouby", "Christophe", , "christophe.regouby@free.fr", c("ctb")),
     person(family = "Posit", role = c("cph"))
     )
 Description: Provides functionality to download and cache files from 'Hugging Face Hub' <https://huggingface.co/models>. 

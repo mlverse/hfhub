@@ -1,0 +1,84 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: hfhub 0.1.1.9000\n"
+"POT-Creation-Date: 2024-09-04 19:28+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: hub_download.R:47
+msgid ""
+"Distant resource does not seem to be on huggingface.co (missing commit "
+"header)."
+msgstr ""
+
+#: hub_download.R:52
+msgid ""
+"Distant resource does not have an ETag, we won't be able to reliably ensure "
+"reproducibility."
+msgstr ""
+
+#: hub_download.R:94
+msgid "Cannot find the requested files in the disk cache and"
+msgstr ""
+
+#: hub_download.R:95
+msgid "outgoing traffic has been disabled. To enable hf.co look-ups"
+msgstr ""
+
+#: hub_download.R:96
+msgid "and downloads online, set 'local_files_only' to False."
+msgstr ""
+
+#: hub_download.R:100
+msgid "Connection error, and we cannot find the requested files in"
+msgstr ""
+
+#: hub_download.R:101
+msgid "the disk cache. Please try again or make sure your Internet"
+msgstr ""
+
+#: hub_download.R:102
+msgid "connection is on."
+msgstr ""
+
+#: hub_download.R:107
+msgid "etag must have been retrieved from server"
+msgstr ""
+
+#: hub_download.R:108
+msgid "commit_hash must have been retrieved from server"
+msgstr ""
+
+#: hub_download.R:156
+msgid "Error downloading from {.url {url}}"
+msgstr ""
+
+#: hub_download.R:170
+msgid "https://huggingface.co/{repo_id}/resolve/{revision}/{filename}"
+msgstr ""
+
+#: hub_download.R:172
+msgid ""
+"https://huggingface.co/{repo_type}s/{repo_id}/resolve/{revision}/{filename}"
+msgstr ""
+
+#: hub_download.R:185
+msgid "{repo_type}s{REPO_ID_SEPARATOR()}{repo_id}"
+msgstr ""
+
+#: hub_info.R:8
+msgid "https://huggingface.co/api/models/{repo_id}"
+msgstr ""
+
+#: hub_info.R:10
+msgid "https://huggingface.co/api/{repo_type}s/{repo_id}"
+msgstr ""
+
+#: hub_info.R:14
+msgid "{path}/revision/{revision}"
+msgstr ""

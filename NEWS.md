@@ -1,5 +1,7 @@
 # hfhub (development version)
 
+* Added FR translation of the R messages. (#8 @cregouby)
+
 # hfhub 0.1.1
 
 * Added a `NEWS.md` file to track changes to the package.
