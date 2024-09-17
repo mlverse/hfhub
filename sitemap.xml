@@ -1,36 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://mlverse.github.io/hfhub/404.html</loc>
-  </url>
-  <url>
-    <loc>https://mlverse.github.io/hfhub/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://mlverse.github.io/hfhub/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://mlverse.github.io/hfhub/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://mlverse.github.io/hfhub/index.html</loc>
-  </url>
-  <url>
-    <loc>https://mlverse.github.io/hfhub/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://mlverse.github.io/hfhub/reference/WEIGHTS_NAME.html</loc>
-  </url>
-  <url>
-    <loc>https://mlverse.github.io/hfhub/reference/hub_download.html</loc>
-  </url>
-  <url>
-    <loc>https://mlverse.github.io/hfhub/reference/hub_repo_info.html</loc>
-  </url>
-  <url>
-    <loc>https://mlverse.github.io/hfhub/reference/hub_snapshot.html</loc>
-  </url>
-  <url>
-    <loc>https://mlverse.github.io/hfhub/reference/index.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://mlverse.github.io/hfhub/404.html</loc></url>
+<url><loc>https://mlverse.github.io/hfhub/LICENSE-text.html</loc></url>
+<url><loc>https://mlverse.github.io/hfhub/LICENSE.html</loc></url>
+<url><loc>https://mlverse.github.io/hfhub/authors.html</loc></url>
+<url><loc>https://mlverse.github.io/hfhub/index.html</loc></url>
+<url><loc>https://mlverse.github.io/hfhub/news/index.html</loc></url>
+<url><loc>https://mlverse.github.io/hfhub/reference/WEIGHTS_NAME.html</loc></url>
+<url><loc>https://mlverse.github.io/hfhub/reference/hub_download.html</loc></url>
+<url><loc>https://mlverse.github.io/hfhub/reference/hub_repo_info.html</loc></url>
+<url><loc>https://mlverse.github.io/hfhub/reference/hub_snapshot.html</loc></url>
+<url><loc>https://mlverse.github.io/hfhub/reference/index.html</loc></url>
 </urlset>
+
