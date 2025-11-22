@@ -159,7 +159,13 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
 
     # fs::link_create doesn't work for linking files on windows.
     try(fs::file_delete(pointer_path), silent = TRUE) # delete the link to avoid warnings
-    file.symlink(blob_path, pointer_path)
+    symlink_success <- suppressWarnings(file.symlink(blob_path, pointer_path))
+
+    # On Windows without admin/developer mode, symlinks fail silently
+    # Fall back to copying the file instead
+    if (!symlink_success && !file.exists(pointer_path)) {
+      file.copy(blob_path, pointer_path)
+    }
   })
 
   pointer_path
