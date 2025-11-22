@@ -125,19 +125,16 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
     return(pointer_path)
   }
 
-  # Check if symlinks are supported (matches Python's behavior)
-  use_symlinks <- supports_symlinks(storage_folder)
+  blob_path <- fs::path(storage_folder, "blobs", etag)
+  fs::dir_create(fs::path_dir(blob_path))
 
-  if (use_symlinks) {
-    # Use blob storage with symlinks (efficient deduplication)
-    blob_path <- fs::path(storage_folder, "blobs", etag)
-    fs::dir_create(fs::path_dir(blob_path))
+  blob_just_downloaded <- FALSE
 
-    if (fs::file_exists(blob_path) && !force_download) {
-      fs::link_create(blob_path, pointer_path)
-      return(pointer_path)
-    }
-
+  if (fs::file_exists(blob_path) && !force_download) {
+    # Blob already exists, we'll link/copy it
+    blob_just_downloaded <- FALSE
+  } else {
+    # Download the blob
     withr::with_tempfile("tmp", {
       lock <- filelock::lock(paste0(blob_path, ".lock"))
       on.exit({filelock::unlock(lock)})
@@ -161,39 +158,12 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
         cli::cli_abort(gettext("Error downloading from {.url {url}}"), parent = err)
       })
       fs::file_move(tmp, blob_path)
-
-      # fs::link_create doesn't work for linking files on windows.
-      try(fs::file_delete(pointer_path), silent = TRUE) # delete the link to avoid warnings
-      file.symlink(blob_path, pointer_path)
     })
-  } else {
-    # Degraded mode: download directly to pointer_path (no symlinks)
-    # This matches Python's huggingface_hub behavior on Windows
-    withr::with_tempfile("tmp", {
-      lock <- filelock::lock(paste0(pointer_path, ".lock"))
-      on.exit({filelock::unlock(lock)})
-      tryCatch({
-        bar_id <- cli::cli_progress_bar(
-          name = filename,
-          total = if (is.numeric(expected_size)) expected_size else NA,
-          type = "download",
-        )
-        progress <- function(down, up) {
-          if (down[1] != 0) {
-            cli::cli_progress_update(total = down[1], set = down[2], id = bar_id)
-          }
-          TRUE
-        }
-        handle <- curl::new_handle(noprogress = FALSE, progressfunction = progress)
-        curl::handle_setheaders(handle, .list = hub_headers())
-        curl::curl_download(url, tmp, handle = handle, quiet = FALSE)
-        cli::cli_progress_done(id = bar_id)
-      }, error = function(err) {
-        cli::cli_abort(gettext("Error downloading from {.url {url}}"), parent = err)
-      })
-      fs::file_move(tmp, pointer_path)
-    })
+    blob_just_downloaded <- TRUE
   }
+
+  # Create pointer file (symlink, move, or copy depending on symlink support)
+  link_or_copy(blob_path, pointer_path, blob_just_downloaded, storage_folder)
 
   pointer_path
 }
@@ -368,6 +338,36 @@ supports_symlinks <- function(storage_folder) {
   }
 
   result
+}
+
+#' Link, move, or copy blob to pointer path based on symlink support
+#'
+#' Helper function that handles creating the final pointer file.
+#' - If symlinks supported: creates symlink
+#' - If symlinks not supported and blob just downloaded: moves file
+#' - If symlinks not supported and blob already existed: copies file
+#'
+#' @param blob_path Path to the blob file (source)
+#' @param pointer_path Path to the pointer file (destination)
+#' @param blob_just_downloaded Whether the blob was just downloaded
+#' @param storage_folder Path to storage folder (for symlink check)
+#' @keywords internal
+link_or_copy <- function(blob_path, pointer_path, blob_just_downloaded, storage_folder) {
+  use_symlinks <- supports_symlinks(storage_folder)
+
+  if (use_symlinks) {
+    # Original behavior: create symlink
+    # fs::link_create doesn't work for linking files on windows.
+    try(fs::file_delete(pointer_path), silent = TRUE) # delete the link to avoid warnings
+    file.symlink(blob_path, pointer_path)
+  } else {
+    # Degraded mode: move if just downloaded, copy if already existed
+    if (blob_just_downloaded) {
+      fs::file_move(blob_path, pointer_path)
+    } else {
+      fs::file_copy(blob_path, pointer_path, overwrite = TRUE)
+    }
+  }
 }
 
 utils::globalVariables("tmp")
