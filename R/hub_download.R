@@ -107,10 +107,7 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
   if (is.null(etag)) cli::cli_abort(gettext("etag must have been retrieved from server"))
   if (is.null(commit_hash)) cli::cli_abort(gettext("commit_hash must have been retrieved from server"))
 
-  blob_path <- fs::path(storage_folder, "blobs", etag)
   pointer_path <- get_pointer_path(storage_folder, commit_hash, filename)
-
-  fs::dir_create(fs::path_dir(blob_path))
   fs::dir_create(fs::path_dir(pointer_path))
 
   # if passed revision is not identical to commit_hash
@@ -128,45 +125,75 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
     return(pointer_path)
   }
 
-  if (fs::file_exists(blob_path) && !force_download) {
-    fs::link_create(blob_path, pointer_path)
-    return(pointer_path)
-  }
+  # Check if symlinks are supported (matches Python's behavior)
+  use_symlinks <- supports_symlinks(storage_folder)
 
-  withr::with_tempfile("tmp", {
-    lock <- filelock::lock(paste0(blob_path, ".lock"))
-    on.exit({filelock::unlock(lock)})
-    tryCatch({
-      bar_id <- cli::cli_progress_bar(
-        name = filename,
-        total = if (is.numeric(expected_size)) expected_size else NA,
-        type = "download",
-      )
-      progress <- function(down, up) {
-        if (down[1] != 0) {
-          cli::cli_progress_update(total = down[1], set = down[2], id = bar_id)
-        }
-        TRUE
-      }
-      handle <- curl::new_handle(noprogress = FALSE, progressfunction = progress)
-      curl::handle_setheaders(handle, .list = hub_headers())
-      curl::curl_download(url, tmp, handle = handle, quiet = FALSE)
-      cli::cli_progress_done(id = bar_id)
-    }, error = function(err) {
-      cli::cli_abort(gettext("Error downloading from {.url {url}}"), parent = err)
-    })
-    fs::file_move(tmp, blob_path)
+  if (use_symlinks) {
+    # Use blob storage with symlinks (efficient deduplication)
+    blob_path <- fs::path(storage_folder, "blobs", etag)
+    fs::dir_create(fs::path_dir(blob_path))
 
-    # fs::link_create doesn't work for linking files on windows.
-    try(fs::file_delete(pointer_path), silent = TRUE) # delete the link to avoid warnings
-    symlink_success <- suppressWarnings(file.symlink(blob_path, pointer_path))
-
-    # On Windows without admin/developer mode, symlinks fail silently
-    # Fall back to copying the file instead
-    if (!symlink_success && !file.exists(pointer_path)) {
-      file.copy(blob_path, pointer_path)
+    if (fs::file_exists(blob_path) && !force_download) {
+      fs::link_create(blob_path, pointer_path)
+      return(pointer_path)
     }
-  })
+
+    withr::with_tempfile("tmp", {
+      lock <- filelock::lock(paste0(blob_path, ".lock"))
+      on.exit({filelock::unlock(lock)})
+      tryCatch({
+        bar_id <- cli::cli_progress_bar(
+          name = filename,
+          total = if (is.numeric(expected_size)) expected_size else NA,
+          type = "download",
+        )
+        progress <- function(down, up) {
+          if (down[1] != 0) {
+            cli::cli_progress_update(total = down[1], set = down[2], id = bar_id)
+          }
+          TRUE
+        }
+        handle <- curl::new_handle(noprogress = FALSE, progressfunction = progress)
+        curl::handle_setheaders(handle, .list = hub_headers())
+        curl::curl_download(url, tmp, handle = handle, quiet = FALSE)
+        cli::cli_progress_done(id = bar_id)
+      }, error = function(err) {
+        cli::cli_abort(gettext("Error downloading from {.url {url}}"), parent = err)
+      })
+      fs::file_move(tmp, blob_path)
+
+      # fs::link_create doesn't work for linking files on windows.
+      try(fs::file_delete(pointer_path), silent = TRUE) # delete the link to avoid warnings
+      file.symlink(blob_path, pointer_path)
+    })
+  } else {
+    # Degraded mode: download directly to pointer_path (no symlinks)
+    # This matches Python's huggingface_hub behavior on Windows
+    withr::with_tempfile("tmp", {
+      lock <- filelock::lock(paste0(pointer_path, ".lock"))
+      on.exit({filelock::unlock(lock)})
+      tryCatch({
+        bar_id <- cli::cli_progress_bar(
+          name = filename,
+          total = if (is.numeric(expected_size)) expected_size else NA,
+          type = "download",
+        )
+        progress <- function(down, up) {
+          if (down[1] != 0) {
+            cli::cli_progress_update(total = down[1], set = down[2], id = bar_id)
+          }
+          TRUE
+        }
+        handle <- curl::new_handle(noprogress = FALSE, progressfunction = progress)
+        curl::handle_setheaders(handle, .list = hub_headers())
+        curl::curl_download(url, tmp, handle = handle, quiet = FALSE)
+        cli::cli_progress_done(id = bar_id)
+      }, error = function(err) {
+        cli::cli_abort(gettext("Error downloading from {.url {url}}"), parent = err)
+      })
+      fs::file_move(tmp, pointer_path)
+    })
+  }
 
   pointer_path
 }
@@ -292,6 +319,55 @@ reqst <- function(method, url, ..., follow_relative_redirects = FALSE) {
     }
   }
   method(url, ...)
+}
+
+# Cache for symlink support detection (per storage folder)
+symlink_support_cache <- new.env(parent = emptyenv())
+
+#' Check if symlinks are supported in the given directory
+#'
+#' Tests whether file.symlink() works in the storage folder.
+#' Caches the result per folder to avoid repeated tests.
+#' Matches Python's huggingface_hub behavior.
+#'
+#' @param storage_folder Path to storage folder
+#' @return TRUE if symlinks work, FALSE otherwise
+#' @keywords internal
+supports_symlinks <- function(storage_folder) {
+  # Check cache first
+  cache_key <- as.character(storage_folder)
+  if (exists(cache_key, envir = symlink_support_cache)) {
+    return(get(cache_key, envir = symlink_support_cache))
+  }
+
+  # Test symlink support
+  test_dir <- fs::path(storage_folder, ".symlink_test")
+  fs::dir_create(test_dir)
+  on.exit(fs::dir_delete(test_dir), add = TRUE)
+
+  test_file <- fs::path(test_dir, "test.txt")
+  test_link <- fs::path(test_dir, "test_link.txt")
+
+  writeLines("test", test_file)
+  result <- suppressWarnings(file.symlink(test_file, test_link))
+
+  # Cache the result
+  assign(cache_key, result, envir = symlink_support_cache)
+
+  # Show warning if symlinks aren't supported (matches Python's behavior)
+  if (!result && !isTRUE(Sys.getenv("HF_HUB_DISABLE_SYMLINKS_WARNING") != "")) {
+    cli::cli_warn(c(
+      "{.pkg hfhub} cache-system uses symlinks by default to efficiently store ",
+      "duplicated files but your machine does not support them in {.path {storage_folder}}. ",
+      "Caching files will still work but in a degraded version that might require ",
+      "more space on your disk. This warning can be disabled by setting the ",
+      "{.envvar HF_HUB_DISABLE_SYMLINKS_WARNING} environment variable.",
+      "i" = "For more details, see {.url https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations}",
+      "i" = "To support symlinks on Windows, you either need to activate Developer Mode or run R as administrator."
+    ))
+  }
+
+  result
 }
 
 utils::globalVariables("tmp")
