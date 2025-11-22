@@ -347,10 +347,10 @@ supports_symlinks <- function(storage_folder) {
 #'
 #' @param blob_path Path to the blob file (source)
 #' @param pointer_path Path to the pointer file (destination)
-#' @param blob_just_downloaded Whether the blob was just downloaded
+#' @param owned Whether the blob is safe to delete if symlinks are not supported
 #' @param storage_folder Path to storage folder (for symlink check)
 #' @noRd
-link_or_copy <- function(blob_path, pointer_path, blob_just_downloaded, storage_folder) {
+link_or_copy <- function(blob_path, pointer_path, owned, storage_folder) {
   use_symlinks <- supports_symlinks(storage_folder)
 
   if (use_symlinks) {
@@ -360,7 +360,7 @@ link_or_copy <- function(blob_path, pointer_path, blob_just_downloaded, storage_
     file.symlink(blob_path, pointer_path)
   } else {
     # Degraded mode: move if just downloaded, copy if already existed
-    if (blob_just_downloaded) {
+    if (owned) {
       fs::file_move(blob_path, pointer_path)
     } else {
       fs::file_copy(blob_path, pointer_path, overwrite = TRUE)
