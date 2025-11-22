@@ -107,7 +107,10 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
   if (is.null(etag)) cli::cli_abort(gettext("etag must have been retrieved from server"))
   if (is.null(commit_hash)) cli::cli_abort(gettext("commit_hash must have been retrieved from server"))
 
+  blob_path <- fs::path(storage_folder, "blobs", etag)
   pointer_path <- get_pointer_path(storage_folder, commit_hash, filename)
+
+  fs::dir_create(fs::path_dir(blob_path))
   fs::dir_create(fs::path_dir(pointer_path))
 
   # if passed revision is not identical to commit_hash
@@ -125,45 +128,40 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
     return(pointer_path)
   }
 
-  blob_path <- fs::path(storage_folder, "blobs", etag)
-  fs::dir_create(fs::path_dir(blob_path))
-
-  blob_just_downloaded <- FALSE
-
   if (fs::file_exists(blob_path) && !force_download) {
     # Blob already exists, we'll link/copy it
-    blob_just_downloaded <- FALSE
-  } else {
-    # Download the blob
-    withr::with_tempfile("tmp", {
-      lock <- filelock::lock(paste0(blob_path, ".lock"))
-      on.exit({filelock::unlock(lock)})
-      tryCatch({
-        bar_id <- cli::cli_progress_bar(
-          name = filename,
-          total = if (is.numeric(expected_size)) expected_size else NA,
-          type = "download",
-        )
-        progress <- function(down, up) {
-          if (down[1] != 0) {
-            cli::cli_progress_update(total = down[1], set = down[2], id = bar_id)
-          }
-          TRUE
-        }
-        handle <- curl::new_handle(noprogress = FALSE, progressfunction = progress)
-        curl::handle_setheaders(handle, .list = hub_headers())
-        curl::curl_download(url, tmp, handle = handle, quiet = FALSE)
-        cli::cli_progress_done(id = bar_id)
-      }, error = function(err) {
-        cli::cli_abort(gettext("Error downloading from {.url {url}}"), parent = err)
-      })
-      fs::file_move(tmp, blob_path)
-    })
-    blob_just_downloaded <- TRUE
+    link_or_copy(blob_path, pointer_path, FALSE, storage_folder)
+    return(pointer_path)
   }
 
+  # Download the blob
+  withr::with_tempfile("tmp", {
+    lock <- filelock::lock(paste0(blob_path, ".lock"))
+    on.exit({filelock::unlock(lock)})
+    tryCatch({
+      bar_id <- cli::cli_progress_bar(
+        name = filename,
+        total = if (is.numeric(expected_size)) expected_size else NA,
+        type = "download",
+      )
+      progress <- function(down, up) {
+        if (down[1] != 0) {
+          cli::cli_progress_update(total = down[1], set = down[2], id = bar_id)
+        }
+        TRUE
+      }
+      handle <- curl::new_handle(noprogress = FALSE, progressfunction = progress)
+      curl::handle_setheaders(handle, .list = hub_headers())
+      curl::curl_download(url, tmp, handle = handle, quiet = FALSE)
+      cli::cli_progress_done(id = bar_id)
+    }, error = function(err) {
+      cli::cli_abort(gettext("Error downloading from {.url {url}}"), parent = err)
+    })
+    fs::file_move(tmp, blob_path)
+  })
+
   # Create pointer file (symlink, move, or copy depending on symlink support)
-  link_or_copy(blob_path, pointer_path, blob_just_downloaded, storage_folder)
+  link_or_copy(blob_path, pointer_path, TRUE, storage_folder)
 
   pointer_path
 }
@@ -302,7 +300,7 @@ symlink_support_cache <- new.env(parent = emptyenv())
 #'
 #' @param storage_folder Path to storage folder
 #' @return TRUE if symlinks work, FALSE otherwise
-#' @keywords internal
+#' @noRd
 supports_symlinks <- function(storage_folder) {
   # Check cache first
   cache_key <- as.character(storage_folder)
@@ -351,7 +349,7 @@ supports_symlinks <- function(storage_folder) {
 #' @param pointer_path Path to the pointer file (destination)
 #' @param blob_just_downloaded Whether the blob was just downloaded
 #' @param storage_folder Path to storage folder (for symlink check)
-#' @keywords internal
+#' @noRd
 link_or_copy <- function(blob_path, pointer_path, blob_just_downloaded, storage_folder) {
   use_symlinks <- supports_symlinks(storage_folder)
 
