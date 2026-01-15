@@ -188,7 +188,10 @@ repo_folder_name <- function(repo_id, repo_type = "model") {
 hub_headers <- function() {
   headers <- c("user-agent" = "hfhub/0.0.1")
 
-  token <- Sys.getenv("HUGGING_FACE_HUB_TOKEN", unset = "")
+  # Check multiple common env var names for HuggingFace token
+  token <- Sys.getenv("HF_TOKEN", unset = "")
+  if (!nzchar(token))
+    token <- Sys.getenv("HUGGING_FACE_HUB_TOKEN", unset = "")
   if (!nzchar(token))
     token <- Sys.getenv("HUGGINGFACE_HUB_TOKEN", unset = "")
 
