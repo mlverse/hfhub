@@ -1,3 +1,5 @@
+# hfhub (development version)
+
 # hfhub 0.1.2
 
 * Added FR translation of the R messages. (#8 @cregouby)
