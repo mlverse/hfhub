@@ -1,17 +1,19 @@
 Package: hfhub
 Title: Hugging Face Hub Interface
-Version: 0.1.1.9001
+Version: 0.1.2
 Authors@R: c(
-    person("Daniel", "Falbel", , "daniel@posit.co", role = c("aut", "cre")),
-    person("Regouby", "Christophe", , "christophe.regouby@free.fr", c("ctb")),
-    person(family = "Posit", role = c("cph"))
+    person("Tomasz", "Kalinowski", , "tomasz@posit.co", role = c("ctb", "cre")),
+    person("Daniel", "Falbel", , "daniel@posit.co", role = c("aut")),
+    person("Christophe", "Regouby", , "christophe.regouby@free.fr", role = c("ctb")),
+    person("Posit Software, PBC", role = c("cph", "fnd"),
+           comment = c(ROR = "03wc8by49"))
     )
 Description: Provides functionality to download and cache files from 'Hugging Face Hub' <https://huggingface.co/models>. 
     Uses the same caching structure so files can be shared between different client libraries.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.3
 Imports:
     httr,
     filelock,
@@ -27,3 +29,4 @@ Suggests:
     jsonlite
 Config/testthat/edition: 3
 URL: https://mlverse.github.io/hfhub/
+BugReports: https://github.com/mlverse/hfhub/issues
