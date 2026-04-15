@@ -62,7 +62,7 @@ print(path)
 str(jsonlite::fromJSON(path))
 })
 })
-#> /tmp/RtmpoCZz2X/models--gpt2/snapshots/607a30d783dfa663caf39e06633721c8d4cfcd7e/config.json
+#> /tmp/RtmprZc6Jf/models--gpt2/snapshots/607a30d783dfa663caf39e06633721c8d4cfcd7e/config.json
 #> List of 22
 #>  $ activation_function   : chr "gelu_new"
 #>  $ architectures         : chr "GPT2LMHeadModel"
