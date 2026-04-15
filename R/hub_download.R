@@ -42,6 +42,29 @@ hub_download <- function(repo_id, filename, ..., revision = "main", repo_type = 
     tryCatch({
       metadata <- get_file_metadata(url)
 
+      # Check for HTTP errors with helpful messages
+      if (!is.null(metadata$status_code) && metadata$status_code >= 400) {
+        if (metadata$error_code == "GatedRepo") {
+          cli::cli_abort(c(
+            "Access denied to gated repository.",
+            "i" = "This model requires accepting a license agreement.",
+            "i" = "Visit {.url https://huggingface.co/{repo_id}} to accept the terms.",
+            "i" = "Make sure you are logged in with the account that owns your HF_TOKEN."
+          ))
+        } else if (metadata$status_code == 401) {
+          cli::cli_abort(c(
+            "Authentication required.",
+            "i" = "Set the {.envvar HF_TOKEN} environment variable with your HuggingFace token.",
+            "i" = "Get a token at {.url https://huggingface.co/settings/tokens}"
+          ))
+        } else if (!is.null(metadata$error_message)) {
+          cli::cli_abort(c(
+            "HuggingFace API error ({metadata$status_code}).",
+            "x" = metadata$error_message
+          ))
+        }
+      }
+
       commit_hash <- metadata$commit_hash
       if (is.null(commit_hash)) {
         cli::cli_abort(gettext("Distant resource does not seem to be on huggingface.co (missing commit header)."))
@@ -188,7 +211,10 @@ repo_folder_name <- function(repo_id, repo_type = "model") {
 hub_headers <- function() {
   headers <- c("user-agent" = "hfhub/0.0.1")
 
-  token <- Sys.getenv("HUGGING_FACE_HUB_TOKEN", unset = "")
+  # Check multiple common env var names for HuggingFace token
+  token <- Sys.getenv("HF_TOKEN", unset = "")
+  if (!nzchar(token))
+    token <- Sys.getenv("HUGGING_FACE_HUB_TOKEN", unset = "")
   if (!nzchar(token))
     token <- Sys.getenv("HUGGINGFACE_HUB_TOKEN", unset = "")
 
@@ -212,10 +238,13 @@ get_file_metadata <- function(url) {
     follow_relative_redirects = TRUE
   )
   list(
+    status_code = req$status_code,
     location = grab_from_headers(req, "location") %||% req$url,
     commit_hash = grab_from_headers(req, "x-repo-commit"),
     etag = normalize_etag(grab_from_headers(req, c(HUGGINGFACE_HEADER_X_LINKED_ETAG(), "etag"))),
-    size = as.integer(grab_from_headers(req, "content-length"))
+    size = as.integer(grab_from_headers(req, "content-length")),
+    error_code = grab_from_headers(req, "x-error-code"),
+    error_message = grab_from_headers(req, "x-error-message")
   )
 }
 
