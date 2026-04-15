@@ -14,7 +14,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/mlverse/hfhub/blob/master/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/mlverse/hfhub/blob/v0.1.2/DESCRIPTION)
 
 Falbel D (2026). *hfhub: Hugging Face Hub Interface*. R package version
 0.1.2, <https://mlverse.github.io/hfhub/>.

@@ -2,6 +2,8 @@
 
 ## hfhub 0.1.2
 
+CRAN release: 2026-04-15
+
 - Added FR translation of the R messages.
   ([\#8](https://github.com/mlverse/hfhub/issues/8)
   [@cregouby](https://github.com/cregouby))
