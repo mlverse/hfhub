@@ -53,3 +53,24 @@ hub_snapshot(
 
   A character vector contaitning patterns to reject files from being
   downloaded.
+
+## Value
+
+A string with the path to the snapshot directory containing all
+downloaded files.
+
+## Examples
+
+``` r
+try({
+withr::with_envvar(c(HUGGINGFACE_HUB_CACHE = tempdir()), {
+path <- hub_snapshot("gpt2", allow_patterns = "config.json")
+list.files(path)
+})
+})
+#> ℹ Snapshotting files 0/6
+#> ✔ Snapshotting files 6/6 [1.1s]
+#> 
+#> [1] "config.json"            "generation_config.json" "onnx"                  
+#> [4] "tokenizer_config.json" 
+```

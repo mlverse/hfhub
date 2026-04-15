@@ -40,6 +40,22 @@ hub_dataset_info(repo_id, ..., revision = NULL, files_metadata = FALSE)
   Obtain files metadata information when querying repository
   information.
 
+## Value
+
+A list with information about the repository, including model details,
+file siblings, tags, and other metadata returned by the Hugging Face
+API.
+
 ## Functions
 
 - `hub_dataset_info()`: Query information from a Hub Dataset
+
+## Examples
+
+``` r
+try({
+info <- hub_repo_info("gpt2")
+info$modelId
+})
+#> [1] "openai-community/gpt2"
+```

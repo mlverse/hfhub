@@ -3,6 +3,8 @@
 ## hfhub (development version)
 
 - Added FR translation of the R messages. (#8 @cregouby)
+- Fixed symlink issues on Windows that caused model snapshots to be
+  empty. (#9)
 
 ## hfhub 0.1.1
 
