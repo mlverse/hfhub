@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">hfhub</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,6 +19,7 @@
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/mlverse/hfhub/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -28,7 +29,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Downloads files from HuggingFace repositories</h1>
-
+      <small class="dont-index">Source: <a href="https://github.com/mlverse/hfhub/blob/master/R/hub_download.R" class="external-link"><code>R/hub_download.R</code></a></small>
       <div class="d-none name"><code>hub_download.Rd</code></div>
     </div>
 
@@ -96,7 +97,7 @@ as an attribute.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB; font-weight: bold;">/tmp/RtmpmHbe0J/models--gpt2/snapshots/607a30d783dfa663caf39e06633721c8d4cfcd7e/config.json</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB; font-weight: bold;">/tmp/RtmpoCZz2X/models--gpt2/snapshots/607a30d783dfa663caf39e06633721c8d4cfcd7e/config.json</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> List of 22</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ activation_function   : chr "gelu_new"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ architectures         : chr "GPT2LMHeadModel"</span>
@@ -131,7 +132,7 @@ as an attribute.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Daniel Falbel.</p>
+  <p>Developed by Tomasz Kalinowski, Daniel Falbel, Posit Software, PBC.</p>
 </div>
 
 <div class="pkgdown-footer-right">

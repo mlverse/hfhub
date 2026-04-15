@@ -69,7 +69,7 @@ list.files(path)
 })
 })
 #> ℹ Snapshotting files 0/6
-#> ✔ Snapshotting files 6/6 [1.1s]
+#> ✔ Snapshotting files 6/6 [326ms]
 #> 
 #> [1] "config.json"            "generation_config.json" "onnx"                  
 #> [4] "tokenizer_config.json" 
