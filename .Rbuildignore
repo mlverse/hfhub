@@ -1,5 +1,6 @@
 ^hfhub\.Rproj$
 ^\.Rproj\.user$
+^\.git$
 ^LICENSE\.md$
 ^\.github$
 ^cran-comments\.md$
