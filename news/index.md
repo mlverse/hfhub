@@ -1,5 +1,7 @@
 # Changelog
 
+## hfhub (development version)
+
 ## hfhub 0.1.2
 
 CRAN release: 2026-04-15

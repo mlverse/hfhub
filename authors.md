@@ -14,15 +14,15 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/mlverse/hfhub/blob/v0.1.2/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/mlverse/hfhub/blob/master/DESCRIPTION)
 
 Falbel D (2026). *hfhub: Hugging Face Hub Interface*. R package version
-0.1.2, <https://mlverse.github.io/hfhub/>.
+0.1.2.9000, <https://mlverse.github.io/hfhub/>.
 
     @Manual{,
       title = {hfhub: Hugging Face Hub Interface},
       author = {Daniel Falbel},
       year = {2026},
-      note = {R package version 0.1.2},
+      note = {R package version 0.1.2.9000},
       url = {https://mlverse.github.io/hfhub/},
     }
