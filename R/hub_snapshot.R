@@ -7,6 +7,15 @@
 #' @param ignore_patterns A character vector contaitning patterns to reject files
 #'   from being downloaded.
 #'
+#' @returns A string with the path to the snapshot directory containing all
+#'   downloaded files.
+#' @examples
+#' try({
+#' withr::with_envvar(c(HUGGINGFACE_HUB_CACHE = tempdir()), {
+#' path <- hub_snapshot("gpt2", allow_patterns = "config.json")
+#' list.files(path)
+#' })
+#' })
 #' @export
 hub_snapshot <- function(repo_id, ..., revision = "main", repo_type = "model",
                          local_files_only = FALSE, force_download = FALSE,

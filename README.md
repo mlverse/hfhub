@@ -23,7 +23,7 @@ remotes::install_github("mlverse/hfhub")
 
 ## Example
 
-`hub_download` the the only exported function in the package and can be used to
+`hub_download` can be used to
 download and cache a file from any Hugging Face Hub repository. It returns a
 path to the file.
 
