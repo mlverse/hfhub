@@ -26,6 +26,10 @@ hub_dataset_info(repo_id, ..., revision = NULL, files_metadata = FALSE)
 
 \item{files_metadata}{Obtain files metadata information when querying repository information.}
 }
+\value{
+A list with information about the repository, including model details,
+file siblings, tags, and other metadata returned by the Hugging Face API.
+}
 \description{
 Queries information about Hub repositories
 }
@@ -34,3 +38,9 @@ Queries information about Hub repositories
 \item \code{hub_dataset_info()}: Query information from a Hub Dataset
 
 }}
+\examples{
+try({
+info <- hub_repo_info("gpt2")
+info$modelId
+})
+}
