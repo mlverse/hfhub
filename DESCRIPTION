@@ -11,7 +11,6 @@ Description: Provides functionality to download and cache files from 'Hugging Fa
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
 Imports:
     httr,
     filelock,
@@ -21,9 +20,11 @@ Imports:
     curl,
     glue,
     urltools,
-    rlang
-Suggests: 
-    testthat (>= 3.0.0),
-    jsonlite
+    rlang,
+    jsonlite,
+    digest
+Suggests:
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3
 URL: https://mlverse.github.io/hfhub/
+Config/roxygen2/version: 8.0.0
