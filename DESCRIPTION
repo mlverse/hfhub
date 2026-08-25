@@ -23,10 +23,11 @@ Imports:
     curl,
     glue,
     urltools,
-    rlang
-Suggests: 
-    testthat (>= 3.0.0),
-    jsonlite
+    rlang,
+    jsonlite,
+    digest
+Suggests:
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3
 URL: https://mlverse.github.io/hfhub/
 BugReports: https://github.com/mlverse/hfhub/issues
