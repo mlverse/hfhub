@@ -23,7 +23,7 @@ remotes::install_github("mlverse/hfhub")
 
 ## Example
 
-`hub_download` the the only exported function in the package and can be used to
+`hub_download` can be used to
 download and cache a file from any Hugging Face Hub repository. It returns a
 path to the file.
 
@@ -35,6 +35,6 @@ str(jsonlite::fromJSON(path))
 
 ## Authentication
 
-You can set the `HUGGING_FACE_HUB_TOKEN` environment variable with the value
+You can set the `HUGGING_FACE_HUB_TOKEN` (or `HF_TOKEN`) environment variable with the value
 of a token obtained in the Access Token section of the Hugging Face account setting page. 
 This will allow you to download private files from Hugging Face Hub.

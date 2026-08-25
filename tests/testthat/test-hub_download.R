@@ -1,6 +1,8 @@
 skip_on_cran()
 
 test_that("hub_download", {
+  withr::local_envvar(list(HF_HUB_DISABLE_SYMLINKS_WARNING = "1"))
+
   file <- hub_download("gpt2", filename = "config.json")
 
   expect_equal(
@@ -26,6 +28,11 @@ test_that("hub_download", {
     file <- hub_download("gpt2", filename = "config.json")
   })
   expect_equal(list.files(tmp), "models--gpt2")
+  # Make sure the config.json exists (detect broken symlink support in Windows)
+  expect_length(
+    Sys.glob(file.path(tmp, "models--gpt2", "snapshots", "*", "config.json")),
+    1
+  )
 })
 
 test_that("can download from private repo", {

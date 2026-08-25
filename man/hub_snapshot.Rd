@@ -34,6 +34,18 @@ filter allowed files to snapshot.}
 \item{ignore_patterns}{A character vector contaitning patterns to reject files
 from being downloaded.}
 }
+\value{
+A string with the path to the snapshot directory containing all
+downloaded files.
+}
 \description{
 Downloads and stores all files from a Hugging Face Hub repository.
+}
+\examples{
+try({
+withr::with_envvar(c(HUGGINGFACE_HUB_CACHE = tempdir()), {
+path <- hub_snapshot("gpt2", allow_patterns = "config.json")
+list.files(path)
+})
+})
 }

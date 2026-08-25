@@ -2,6 +2,14 @@
 #'
 #' @inheritParams hub_download
 #' @param files_metadata Obtain files metadata information when querying repository information.
+#'
+#' @returns A list with information about the repository, including model details,
+#'   file siblings, tags, and other metadata returned by the Hugging Face API.
+#' @examples
+#' try({
+#' info <- hub_repo_info("gpt2")
+#' info$modelId
+#' })
 #' @export
 hub_repo_info <- function(repo_id, ..., repo_type = NULL, revision = NULL, files_metadata = FALSE) {
   if (is.null(repo_type) || repo_type == "model") {
