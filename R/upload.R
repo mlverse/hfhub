@@ -22,7 +22,8 @@
 #'   `HF_TOKEN` / `HUGGING_FACE_HUB_TOKEN` / `HUGGINGFACE_HUB_TOKEN`
 #'   environment variables.
 #'
-#' @return Invisibly, the list of repository paths that were committed.
+#' @return Invisibly, a character vector of the repository paths that
+#'   were committed.
 #'
 #' @examples
 #' \dontrun{
@@ -44,8 +45,13 @@ hub_upload <- function(repo_id, path, path_in_repo = NULL, ...,
 
   # resolve the local files and their destination paths in the repo
   if (fs::is_dir(path)) {
-    files <- list.files(path, recursive = TRUE, full.names = TRUE)
+    # all.files: dotfiles are ordinary repo content on the Hub
+    # (.gitattributes above all), and the default drops them silently.
+    # The local git metadata is the one thing never to ship.
+    files <- list.files(path, recursive = TRUE, full.names = TRUE,
+      all.files = TRUE)
     files <- files[!fs::is_dir(files)]
+    files <- files[!grepl("(^|/)\\.git/", files)]
     rel <- fs::path_rel(files, path)
     repo_paths <- if (!is.null(path_in_repo)) fs::path(path_in_repo, rel) else rel
   } else {
@@ -54,6 +60,12 @@ hub_upload <- function(repo_id, path, path_in_repo = NULL, ...,
   }
   files <- as.character(files)
   repo_paths <- as.character(repo_paths)
+  # A commit with no operations posts a header-only NDJSON body, which the
+  # Hub accepts as an empty commit. Refuse instead of inventing one.
+  if (!length(files)) {
+    cli::cli_abort(c("Nothing to upload from {.path {path}}.",
+      "i" = "The directory is empty, or holds only {.path .git} metadata."))
+  }
 
   # classify + hash
   sizes <- file.size(files)
@@ -105,6 +117,12 @@ hub_delete <- function(repo_id, paths, ...,
   repo_type <- match.arg(repo_type)
   if (!nzchar(token)) {
     cli::cli_abort("A Hugging Face token with write access is required.")
+  }
+  paths <- as.character(paths)
+  # Same header-only-commit trap as hub_upload(): zero operations is an
+  # empty commit, not a no-op.
+  if (!length(paths)) {
+    cli::cli_abort("{.arg paths} is empty; nothing to delete.")
   }
   operations <- lapply(paths, function(p)
     list(key = "deletedFile", value = list(path = p)))
@@ -172,7 +190,7 @@ upload_lfs_objects <- function(repo_id, files, oids, sizes, repo_type,
   by_oid <- stats::setNames(seq_along(oids), oids)
   for (obj in batch$objects) {
     i <- by_oid[[obj$oid]]
-    up <- obj$actions$upload
+    up <- lfs_upload_action(obj)
     if (is.null(up)) next  # already present
     if (!is.null(up$header) && !is.null(up$header[["chunk_size"]])) {
       upload_lfs_multipart(files[i], up, obj$oid, token)
@@ -185,11 +203,35 @@ upload_lfs_objects <- function(repo_id, files, oids, sizes, repo_type,
   invisible()
 }
 
+# The batch reply reports per-object failures in `error`, and an object
+# that failed carries no `actions` either. Reading a missing upload action
+# as "the server already has it" therefore swallows the failure and lets
+# the commit reference an oid that was never stored. Only a missing action
+# WITHOUT an error means dedup.
+lfs_upload_action <- function(obj) {
+  if (!is.null(obj$error)) {
+    cli::cli_abort(c(
+      "The LFS server rejected object {.val {obj$oid}}.",
+      "x" = "{obj$error$message %||% 'no message'} (code {obj$error$code %||% NA})"))
+  }
+  obj$actions$upload
+}
+
+# Part URLs arrive as header names "1".."N". They must be ordered
+# NUMERICALLY: sort() on character puts "10" before "2", and since the
+# chunks are read sequentially from the connection that misalignment PUTs
+# chunk 2 to part 10's URL and labels its ETag partNumber 10. At the Hub's
+# typical chunk size that corrupts any upload past ~10 parts.
+lfs_part_keys <- function(header) {
+  keys <- grep("^[0-9]+$", names(header), value = TRUE)
+  keys[order(as.integer(keys))]
+}
+
 # Multipart: PUT each chunk to its presigned part URL, collect ETags,
 # POST complete_multipart to finalize.
 upload_lfs_multipart <- function(file, up, oid, token) {
   chunk_size <- as.numeric(up$header[["chunk_size"]])
-  part_keys <- sort(grep("^[0-9]+$", names(up$header), value = TRUE))
+  part_keys <- lfs_part_keys(up$header)
   con <- file(file, "rb")
   on.exit(close(con))
   parts <- lapply(part_keys, function(k) {

@@ -42,7 +42,8 @@ or \code{"space"}.}
 environment variables.}
 }
 \value{
-Invisibly, the list of repository paths that were committed.
+Invisibly, a character vector of the repository paths that
+were committed.
 }
 \description{
 Uploads a file or a whole directory to a repository on the Hugging Face
